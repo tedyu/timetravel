@@ -28,6 +28,10 @@ type RecordService interface {
 	//
 	// UpdateRecord will error if id <= 0 or the record does not exist with that id.
 	UpdateRecord(ctx context.Context, id int, updates map[string]*string) (entity.Record, error)
+
+	// GetLatestVersion will return the latest version of the record if the record exists.
+	// Otherwise error will be returned.
+	GetLatestVersion(ctx context.Context, id int) (int, error)
 }
 
 // InMemoryRecordService is an in-memory implementation of RecordService.
@@ -39,6 +43,10 @@ func NewInMemoryRecordService() InMemoryRecordService {
 	return InMemoryRecordService{
 		data: map[int]entity.Record{},
 	}
+}
+
+func (s *InMemoryRecordService) GetLatestVersion(ctx context.Context, id int) (int, error) {
+	return 1, nil
 }
 
 func (s *InMemoryRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {

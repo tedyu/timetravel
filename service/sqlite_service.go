@@ -36,6 +36,20 @@ func NewSQLiteRecordService() *SQLiteRecordService {
     return &SQLiteRecordService{db: db}
 }
 
+func (s *SQLiteRecordService) GetLatestVersion(ctx context.Context, id int) (int, error) {
+    var err error
+    var verRead int
+    query := "SELECT ver FROM records WHERE id = ? ORDER BY ver desc LIMIT 1"
+    err = s.db.QueryRowContext(ctx, query, id).Scan(&verRead)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 1, ErrRecordDoesNotExist
+        }
+        return 1, err
+    }
+    return verRead, nil
+}
+
 // GetRecord retrieves a record by id
 func (s *SQLiteRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {
     var jsonData string
