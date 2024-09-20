@@ -139,3 +139,7 @@ backend must delete that key of the record.
 < Content-Type: application/json; charset=utf-8
 {"id":1,"data":{"status":"ok"}}
 ```
+
+Run this command to install sqlite:
+
+go get github.com/mattn/go-sqlite3

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,7 +30,8 @@ func (a *API) PostRecords(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
-		err := writeError(w, "invalid input; could not parse json", http.StatusBadRequest)
+		errMessage := fmt.Sprintf("invalid input; could not parse json: %v", err)
+		err := writeError(w, errMessage, http.StatusBadRequest)
 		logError(err)
 		return
 	}

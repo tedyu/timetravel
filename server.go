@@ -21,8 +21,8 @@ func logError(err error) {
 func main() {
 	router := mux.NewRouter()
 
-	service := service.NewInMemoryRecordService()
-	api := api.NewAPI(&service)
+        service := service.NewSQLiteRecordService()
+	api := api.NewAPI(service)
 
 	apiRoute := router.PathPrefix("/api/v1").Subrouter()
 	apiRoute.Path("/health").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
