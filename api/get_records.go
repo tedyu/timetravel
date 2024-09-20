@@ -13,6 +13,7 @@ import (
 func (a *API) GetRecords(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := mux.Vars(r)["id"]
+	ver := mux.Vars(r)["ver"]
 
 	idNumber, err := strconv.ParseInt(id, 10, 32)
 
@@ -22,9 +23,14 @@ func (a *API) GetRecords(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	verNumber, err := strconv.ParseInt(ver, 10, 32)
+	if err != nil {
+		verNumber = -1
+	}
 	record, err := a.records.GetRecord(
 		ctx,
 		int(idNumber),
+		int(verNumber),
 	)
 	if err != nil {
 		err := writeError(w, fmt.Sprintf("record of id %v does not exist", idNumber), http.StatusBadRequest)

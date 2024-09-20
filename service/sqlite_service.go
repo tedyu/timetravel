@@ -21,10 +21,12 @@ func NewSQLiteRecordService() *SQLiteRecordService {
         log.Fatal(err)
     }
 
-    // Create table if not exists
+    // The `ver` field is used by v2 of the service
     createTable := `CREATE TABLE IF NOT EXISTS records (
-        id INTEGER PRIMARY KEY,
-        data TEXT
+        id INTEGER,
+        data TEXT,
+        ver INTEGER,
+        PRIMARY KEY (id, ver)
     );`
     _, err = db.Exec(createTable)
     if err != nil {
@@ -35,10 +37,17 @@ func NewSQLiteRecordService() *SQLiteRecordService {
 }
 
 // GetRecord retrieves a record by id
-func (s *SQLiteRecordService) GetRecord(ctx context.Context, id int) (entity.Record, error) {
+func (s *SQLiteRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {
     var jsonData string
-    query := "SELECT data FROM records WHERE id = ?"
-    err := s.db.QueryRowContext(ctx, query, id).Scan(&jsonData)
+    var err error
+    var verRead int
+    if ver < 0 {
+        query := "SELECT data, ver FROM records WHERE id = ? ORDER BY ver desc LIMIT 1"
+        err = s.db.QueryRowContext(ctx, query, id).Scan(&jsonData, &verRead)
+    } else {
+        query := "SELECT data, ver FROM records WHERE id = ? AND ver = ?"
+        err = s.db.QueryRowContext(ctx, query, id, ver).Scan(&jsonData, &verRead)
+    }
     if err != nil {
         if err == sql.ErrNoRows {
             return entity.Record{}, ErrRecordDoesNotExist
@@ -52,7 +61,7 @@ func (s *SQLiteRecordService) GetRecord(ctx context.Context, id int) (entity.Rec
         return entity.Record{}, err
     }
 
-    return entity.Record{ID: id, Data: data}, nil
+    return entity.Record{ID: id, Data: data, Ver: verRead}, nil
 }
 
 // CreateRecord inserts a new record into the database
@@ -64,7 +73,7 @@ func (s *SQLiteRecordService) CreateRecord(ctx context.Context, record entity.Re
     }
 
     // Insert the record
-    query := `INSERT INTO records (id, data) VALUES (?, ?)`
+    query := `INSERT INTO records (id, data, ver) VALUES (?, ?, 1)`
     _, err = s.db.ExecContext(ctx, query, record.ID, string(jsonData))
     if err != nil {
         return err
@@ -76,7 +85,7 @@ func (s *SQLiteRecordService) CreateRecord(ctx context.Context, record entity.Re
 // UpdateRecord updates the existing record with new data or deletes keys if values are null
 func (s *SQLiteRecordService) UpdateRecord(ctx context.Context, id int, updates map[string]*string) (entity.Record, error) {
     // Retrieve the existing record first
-    record, err := s.GetRecord(ctx, id)
+    record, err := s.GetRecord(ctx, id, -1)
     if err != nil {
         return entity.Record{}, err
     }
@@ -97,11 +106,24 @@ func (s *SQLiteRecordService) UpdateRecord(ctx context.Context, id int, updates 
     }
 
     // Update the record in the database
-    query := `UPDATE records SET data = ? WHERE id = ?`
-    _, err = s.db.ExecContext(ctx, query, string(jsonData), id)
+    query := `UPDATE records SET data = ?, ver = ? WHERE id = ?`
+    ver := record.Ver
+    if src, ok := ctx.Value("src").(string); ok {
+        if src == "v2" {
+            // increment the version
+            ver++
+            query = `INSERT INTO records (id, data, ver) VALUES (?, ?, ?)`
+            _, err = s.db.ExecContext(ctx, query, record.ID, string(jsonData), ver)
+        } else {
+            _, err = s.db.ExecContext(ctx, query, string(jsonData), ver, id)
+        } 
+    } else {
+        _, err = s.db.ExecContext(ctx, query, string(jsonData), ver, id)
+    }
     if err != nil {
         return entity.Record{}, err
     }
 
+    record.Ver = ver
     return record, nil
 }

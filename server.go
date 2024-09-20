@@ -31,6 +31,13 @@ func main() {
 	})
 	api.CreateRoutes(apiRoute)
 
+	apiRouteV2 := router.PathPrefix("/api/v2").Subrouter()
+	apiRouteV2.Path("/health").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+		logError(err)
+	})
+	api.CreateRoutes2(apiRouteV2)
+
 	address := "127.0.0.1:8000"
 	srv := &http.Server{
 		Handler:      router,

@@ -15,7 +15,8 @@ var ErrRecordAlreadyExists = errors.New("record already exists")
 type RecordService interface {
 
 	// GetRecord will retrieve an record.
-	GetRecord(ctx context.Context, id int) (entity.Record, error)
+	// When ver is -1, fetch the latest version of the record
+	GetRecord(ctx context.Context, id int, ver int) (entity.Record, error)
 
 	// CreateRecord will insert a new record.
 	//
@@ -40,7 +41,7 @@ func NewInMemoryRecordService() InMemoryRecordService {
 	}
 }
 
-func (s *InMemoryRecordService) GetRecord(ctx context.Context, id int) (entity.Record, error) {
+func (s *InMemoryRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {
 	record := s.data[id]
 	if record.ID == 0 {
 		return entity.Record{}, ErrRecordDoesNotExist

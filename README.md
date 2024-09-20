@@ -11,8 +11,8 @@ data points that go into the calculation of their rate. When a policy-holder upd
 their information, I.E. they change addresses, or add/remove new employees to their team
 we will be notified and we must keep our records up to date.
 
-The current version of the repo is an extremely simplified version of exactly that. `GET /api/v1/record/{id}`
-will retrieve a record, which is just a json mapping strings to strings. and `POST /api/v1/record/{id}`
+The current version of the repo is an extremely simplified version of exactly that. `GET /api/v1/records/{id}`
+will retrieve a record, which is just a json mapping strings to strings. and `POST /api/v1/records/{id}`
 will either create a new record or modify an existing record. However, it isn't enough to
 just keep a record of the current record state but we must maintain a reference to how the state
 has changed to be in full compliance.

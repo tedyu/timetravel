@@ -40,6 +40,7 @@ func (a *API) PostRecords(w http.ResponseWriter, r *http.Request) {
 	record, err := a.records.GetRecord(
 		ctx,
 		int(idNumber),
+		-1,
 	)
 
 	if !errors.Is(err, service.ErrRecordDoesNotExist) { // record exists
@@ -57,6 +58,7 @@ func (a *API) PostRecords(w http.ResponseWriter, r *http.Request) {
 		record = entity.Record{
 			ID:   int(idNumber),
 			Data: recordMap,
+			Ver:  1,
 		}
 		err = a.records.CreateRecord(ctx, record)
 	}
