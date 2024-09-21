@@ -60,8 +60,8 @@ func TestAPIScenarios(t *testing.T) {
 	expectedBody2 := `{"id":1,"data":{"hello":"z"},"Ver":2}`
 	checkResponseBody(t, resp5, expectedBody2)
 
-	// Simulate a POST request to /v1/records/2 with '{"hell":"z"}'
-	postData3 := map[string]string{"hell": "z"}
+	// Simulate a POST request to /v1/records/2 with '{"green":"z"}'
+	postData3 := map[string]string{"green": "z"}
 	resp6, err := sendPostRequest(baseURL+"/v1/records/2", postData3)
 	if err != nil {
 		t.Fatalf("POST /v1/records/2 failed: %v", err)
@@ -69,8 +69,8 @@ func TestAPIScenarios(t *testing.T) {
 	defer resp6.Body.Close()
 	checkResponseCode(t, resp6, http.StatusOK)
 
-	// Simulate a POST request to /v1/records/2 with '{"hell":"y"}'
-	postData4 := map[string]string{"hell": "y"}
+	// Simulate a POST request to /v1/records/2 with '{"green":"y"}'
+	postData4 := map[string]string{"green": "y"}
 	resp7, err := sendPostRequest(baseURL+"/v1/records/2", postData4)
 	if err != nil {
 		t.Fatalf("POST /v1/records/2 failed: %v", err)
@@ -85,7 +85,7 @@ func TestAPIScenarios(t *testing.T) {
 	}
 	defer resp8.Body.Close()
 	checkResponseCode(t, resp8, http.StatusOK)
-	expectedBody3 := `{"id":2,"data":{"hell":"y"},"Ver":1}`
+	expectedBody3 := `{"id":2,"data":{"green":"y"},"Ver":1}`
 	checkResponseBody(t, resp8, expectedBody3)
 
 	// Simulate a GET request to /v2/records/1/latest (should return latest version)
