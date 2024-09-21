@@ -141,5 +141,22 @@ backend must delete that key of the record.
 ```
 
 Run this command to install sqlite:
-
+```
 go get github.com/mattn/go-sqlite3
+```
+
+To run timetravel_test.go, in one terminal:
+
+```
+go run server.go
+```
+
+In another terminal, under `test` directory, run
+
+```
+go test -v
+
+=== RUN   TestAPIScenarios
+--- PASS: TestAPIScenarios (0.02s)
+PASS
+```
