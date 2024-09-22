@@ -145,6 +145,28 @@ Run this command to install sqlite:
 go get github.com/mattn/go-sqlite3
 ```
 
+To delete record with given version:
+```
+curl -X DELETE http://127.0.0.1:8000/api/v2/records/1/version/1
+```
+
+Prior to the DELETE:
+
+```
+sqlite> select * from records;
+1|{"hello":"x"}|1
+1|{"hello":"z"}|2
+2|{"green":"y"}|1
+```
+
+After the DELETE:
+
+```
+sqlite> select * from records;
+1|{"hello":"z"}|2
+2|{"green":"y"}|1
+```
+
 To run timetravel_test.go, in one terminal:
 
 ```
