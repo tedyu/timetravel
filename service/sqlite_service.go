@@ -4,6 +4,7 @@ import (
     "context"
     "database/sql"
     "encoding/json"
+    "fmt"
     "log"
 
     _ "github.com/mattn/go-sqlite3"
@@ -36,6 +37,7 @@ func NewSQLiteRecordService() *SQLiteRecordService {
     return &SQLiteRecordService{db: db}
 }
 
+// GetLatestVersion gets the latest version for the given id
 func (s *SQLiteRecordService) GetLatestVersion(ctx context.Context, id int) (int, error) {
     var err error
     var verRead int
@@ -50,6 +52,31 @@ func (s *SQLiteRecordService) GetLatestVersion(ctx context.Context, id int) (int
     return verRead, nil
 }
 
+// DeleteRecordForVersion deletes the specified version for the given id
+func (s *SQLiteRecordService) DeleteRecordForVersion(ctx context.Context, id int, ver int) (error) {
+    stmt, err := s.db.Prepare("DELETE FROM records WHERE id = ? AND ver = ?")
+    if err != nil {
+        return fmt.Errorf("failed to prepare statement: %v", err)
+    }
+    defer stmt.Close()
+
+    // Execute the DELETE statement with the id and ver as parameters
+    res, err := stmt.Exec(id, ver)
+    if err != nil {
+        return fmt.Errorf("failed to execute delete: %v", err)
+    }
+
+    // Check how many rows were affected by the DELETE
+    rowsAffected, err := res.RowsAffected()
+    if err != nil {
+        return fmt.Errorf("failed to retrieve rows affected: %v", err)
+    }
+
+    if rowsAffected == 0 {
+        return fmt.Errorf("no record found with id %d and version %d", id, ver)
+    }
+    return nil
+}
 // GetRecord retrieves a record by id
 func (s *SQLiteRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {
     var jsonData string

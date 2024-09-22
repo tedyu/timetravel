@@ -36,5 +36,6 @@ func (a *API) CreateRoutes2(routes *mux.Router) {
 	routes.Path("/records/{id}/version/{ver}").HandlerFunc(addRequestSource(a.GetRecords)).Methods("GET")
 	routes.Path("/records/{id}").HandlerFunc(addRequestSource(a.GetRecords)).Methods("GET")
 	routes.Path("/records/{id}/latest").HandlerFunc(addRequestSource(a.GetLatestVersion)).Methods("GET")
+	routes.Path("/records/{id}/version/{ver}").HandlerFunc(addRequestSource(a.DeleteRecord)).Methods("DELETE")
 	routes.Path("/records/{id}").HandlerFunc(addRequestSource(a.PostRecords)).Methods("POST")
 }

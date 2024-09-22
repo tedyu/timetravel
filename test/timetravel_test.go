@@ -97,6 +97,13 @@ func TestAPIScenarios(t *testing.T) {
 	checkResponseCode(t, resp9, http.StatusOK)
 	expectedLatest := `"{version:2}"`
 	checkResponseBody(t, resp9, expectedLatest)
+
+	respa, err := sendDeleteRequest(baseURL + "/v2/records/1/version/1")
+	if err != nil {
+		t.Fatalf("DELETE /v2/records/1/version/1 failed: %v", err)
+	}
+	defer respa.Body.Close()
+	checkResponseCode(t, respa, http.StatusOK)
 }
 
 // Helper function to send POST request
@@ -115,6 +122,16 @@ func sendPostRequest(url string, data map[string]string) (*http.Response, error)
 func sendGetRequest(url string) (*http.Response, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	return client.Do(req)
+}
+
+// Helper function to send DELETE request
+func sendDeleteRequest(url string) (*http.Response, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return nil, err
 	}

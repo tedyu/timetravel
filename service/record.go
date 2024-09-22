@@ -32,6 +32,9 @@ type RecordService interface {
 	// GetLatestVersion will return the latest version of the record if the record exists.
 	// Otherwise error will be returned.
 	GetLatestVersion(ctx context.Context, id int) (int, error)
+
+	// DeleteRecordForVersion deletes the record with given version
+	DeleteRecordForVersion(ctx context.Context, id int, ver int) (error)
 }
 
 // InMemoryRecordService is an in-memory implementation of RecordService.
@@ -47,6 +50,10 @@ func NewInMemoryRecordService() InMemoryRecordService {
 
 func (s *InMemoryRecordService) GetLatestVersion(ctx context.Context, id int) (int, error) {
 	return 1, nil
+}
+
+func (s *InMemoryRecordService) DeleteRecordForVersion(ctx context.Context, id int, ver int) (error) {
+	return nil
 }
 
 func (s *InMemoryRecordService) GetRecord(ctx context.Context, id int, ver int) (entity.Record, error) {
